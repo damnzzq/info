@@ -1,6 +1,5 @@
 const cameraVideo = document.getElementById('cameraVideo');
 const screamerVideo = document.getElementById('screamerVideo');
-const canvas = document.getElementById('canvas');
 const cookieConsent = document.getElementById('cookie-consent');
 const acceptBtn = document.getElementById('accept-cookies');
 const rejectBtn = document.getElementById('reject-cookies');
