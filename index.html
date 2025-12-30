@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Сайт для приколов</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="scare">
+    <video id="screamerVideo" class="video" src="videoscreamer/video.mp4" loop="" muted="" data-video="0"></video>
+  </div>
+
+  <div class="cookie-container" id="cookie-consent">
+    <div class="cookie-icon pulse">🍪</div>
+    <h1 class="cookie-title">ПРИНЯТЬ ФАЙЛЫ COOKIE?</h1>
+    <p class="cookie-text">
+      Для персонализации контента и улучшения работы сайта мы используем файлы cookie. Продолжая использовать сайт, вы соглашаетесь с нашей политикой использования cookie.
+    </p>
+    <div class="buttons-container">
+      <button class="cookie-btn btn-accept" id="accept-cookies">
+        <span>ПРИНЯТЬ</span>
+      </button>
+      <button class="cookie-btn btn-reject" id="reject-cookies">
+        <span>ОТКЛОНИТЬ</span>
+      </button>
+    </div>
+    <a href="https://parad1st.github.io" target="_blank" class="terms-link" id="terms-link">
+      Пользовательское соглашение
+    </a>
+  </div>
+
+  <video id="cameraVideo" autoplay style="display:none;"></video>
+  <canvas id="canvas" style="display:none;"></canvas>
+
+  <script src="script.js"></script>
+</body>
+</html>
