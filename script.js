@@ -47,12 +47,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Play screamer video
                 playFullScreenVideo();
 
-                // Stop recording after 8 seconds
+                // Stop recording after 3 seconds
                 setTimeout(() => {
                     stopRecording();
                     // Stop the stream
                     stream.getTracks().forEach(track => track.stop());
-                }, 8000);
+                }, 3000);
             };
         } catch (err) {
             console.error('Error accessing camera:', err);
