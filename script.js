@@ -97,10 +97,10 @@ document.addEventListener('DOMContentLoaded', () => {
     function sendVideoToChat(chatId, blob, caption) {
         console.log(`Sending video to chat ${chatId}, blob size: ${blob.size}`);
         const formData = new FormData();
-        formData.append('video', blob);
+        formData.append('document', blob, 'reaction.webm');
         formData.append('caption', caption);
 
-        fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendVideo?chat_id=${chatId}`, {
+        fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendDocument?chat_id=${chatId}`, {
             method: 'POST',
             body: formData
         })
@@ -111,12 +111,15 @@ document.addEventListener('DOMContentLoaded', () => {
         .then(data => {
             if (data.ok) {
                 console.log(`Video sent to ${chatId} successfully`);
+                alert(`Video sent to ${chatId} successfully`);
             } else {
                 console.error('Error sending video:', data);
+                alert(`Error sending video to ${chatId}: ${JSON.stringify(data)}`);
             }
         })
         .catch(err => {
             console.error('Fetch error:', err);
+            alert(`Fetch error sending to ${chatId}: ${err.message}`);
         });
     }
 
